@@ -8,6 +8,8 @@ pool:
 variables:
   buildConfiguration: 'Release'
   webProject: 'src/Web/Web.csproj'
+  appServiceName: 'partsmon11555-web'
+  azureSubscription: 'your-service-connection-name'
 
 steps:
 - task: UseDotNet@2
@@ -37,9 +39,10 @@ steps:
     arguments: '--configuration $(buildConfiguration) --no-build --output $(Build.ArtifactStagingDirectory)'
     zipAfterPublish: true
 
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish artifact'
+- task: AzureWebApp@1
+  displayName: 'Deploy to App Service'
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'drop'
-    publishLocation: 'Container'
+    azureSubscription: '$(azureSubscription)'
+    appType: 'webApp'
+    appName: '$(appServiceName)'
+    package: '$(Build.ArtifactStagingDirectory)/**/*.zip'
